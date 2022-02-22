@@ -1,12 +1,11 @@
 const passport = require("passport");
-const User = require("../models/user");
-const config = require("../config");
+const User = require("../model/users");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const localStrategy = require("passport-local");
 
 const localLogin = new localStrategy(
-  { usernameField: "email" },
+  { usernameField: "username" },
   (username, pass, done) => {
     User.findOne({ username: username })
       .exec()
@@ -19,13 +18,10 @@ const localLogin = new localStrategy(
             if (!isMatch) {
               return done(null, false);
             }
-
             return done(null, us);
           });
         } else {
-          {
-            return done("can not find user");
-          }
+          return done("can not find user", false);
         }
       })
       .catch((err) => {
@@ -38,10 +34,11 @@ const localLogin = new localStrategy(
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromHeader("sabti"),
-  secretOrKey: config.secret,
+  secretOrKey: "skjdhws8904w3biusdb928nisbdamiraliali",
 };
 
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
+  console.log("dddds");
   User.findById(payload.sub)
     .exec()
     .then((us) => {

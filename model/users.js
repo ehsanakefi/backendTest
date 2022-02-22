@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
-var db = mongoose.connection;
 const UserSchema = new Schema({
   username: { type: String, unique: true },
   name: { type: String },
@@ -13,7 +12,6 @@ UserSchema.pre("save", function (next) {
   let user = this;
   console.log("user");
   const hash = bcrypt.hashSync(user.password, 10);
-  console.log(hash);
   user.password = hash;
   next();
 });
@@ -29,6 +27,6 @@ UserSchema.methods.comparePass = function (condidatePassword, callback) {
     callback(null, isMatch);
   });
 };
-const ModelUser = mongoose.model("User", UserSchema);
+const ModelUser = mongoose.model("user", UserSchema);
 
 module.exports = ModelUser;
