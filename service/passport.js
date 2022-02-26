@@ -39,20 +39,20 @@ const jwtOptions = {
 
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
   console.log("dddds");
-  User.findById(payload.sub)
-    .exec()
-    .then((us) => {
-      if (us) {
-        return done(null, us);
-      } else {
-        return done(null, false);
-      }
-    })
-    .catch((err) => {
-      if (err) {
-        return done(err);
-      }
-    });
+  // User.findById(payload.sub)
+  //   .exec()
+  //   .then((us) => {
+  //     if (us) {
+  //       return done(null, us);
+  //     } else {
+  //       return done(null, false);
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     if (err) {
+  //       return done(err);
+  //     }
+  //   });
 });
 
 passport.use(jwtLogin);

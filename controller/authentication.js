@@ -1,25 +1,39 @@
-const jwt = require("jwt-simple");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const User = require("../model/users");
 // const config = require("../config");
 // const Tell = require("../service/telephone");
 // const _ = require("lodash");
 
 function tok(user) {
-  const allan = new Date().getTime();
-  return jwt.encode(
-    { sub: user._id, iat: allan },
-    "skjdhws8904w3biusdb928nisbdamiraliali"
-  );
+  return jwt.sign({ user }, "skjdhws8904w3biusdb928nisbdamiraliali");
 }
 
 exports.login = (req, res, next) => {
   const { username, password } = req.body;
-  console.log("lll");
+
   if (!username || !password) {
     return res
       .status(422)
       .send({ error: "you most send your password or username!" });
   }
+
+  User.findOne({ username: username })
+    .exec()
+    .then((userFind) => {
+      userFind &&
+        bcrypt
+          .compare(userFind.password, password)
+          .then((result) => {
+            return res.json({ token: tok(userFind), user: userFind });
+          })
+          .catch(() => {
+            return res
+              .status(401)
+              .send({ error: "you most have  username password " });
+          });
+    })
+    .catch((err) => res.status(422).send({ error: "login failed", err }));
 };
 
 exports.register = (req, res, next) => {
@@ -42,7 +56,6 @@ exports.register = (req, res, next) => {
           password,
           name,
         });
-        console.log("slam");
         if (req.body.fcmToken) {
           user.fcmToken = req.body.fcmToken;
         }
@@ -55,12 +68,12 @@ exports.register = (req, res, next) => {
     })
     .catch((err) => res.status(422).send({ error: "Register failed", err }));
 };
+
 exports.getUsers = (req, res, next) => {
-  console.log("getuser");
   User.find()
     .limit(30)
     .sort({ _id: -1 })
     .exec()
     .then((users) => res.json({ users }))
-    .catch((err) => res.status(422).send({ error: "anjam neshod" }));
+    .catch((err) => res.status(422).send({ error: "request failed" }));
 };
