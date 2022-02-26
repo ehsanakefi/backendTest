@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../model/users");
+const res = require("express/lib/response");
 // const config = require("../config");
 // const Tell = require("../service/telephone");
 // const _ = require("lodash");
@@ -70,10 +71,19 @@ exports.register = (req, res, next) => {
 };
 
 exports.getUsers = (req, res, next) => {
-  User.find()
-    .limit(30)
-    .sort({ _id: -1 })
-    .exec()
-    .then((users) => res.json({ users }))
-    .catch((err) => res.status(422).send({ error: "request failed" }));
+  req.rawHeaders[1]
+    ? jwt.verify(
+        req.rawHeaders[1],
+        "skjdhws8904w3biusdb928nisbdamiraliali",
+        (err, user) => {
+          if (err) return res.sendStatus(403);
+          User.find()
+            .limit(30)
+            .sort({ _id: -1 })
+            .exec()
+            .then((users) => res.json({ users }))
+            .catch((err) => res.status(422).send({ error: "request failed" }));
+        }
+      )
+    : res.status(402).send({ error: "please enter Token" });
 };
